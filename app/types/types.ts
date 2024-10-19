@@ -1,3 +1,9 @@
+// For zustand
+type User = {
+  username: string,
+  password: string
+}
+
 type AuthFormRequest = {
   username: string;
   password: string;
@@ -8,4 +14,9 @@ type AuthFormResponse = {
   token?: string;
 }
 
-export type { AuthFormRequest, AuthFormResponse };
+type PasswordChange = { 
+  oldPassword: string;
+  newPassword: string;
+}
+
+export type { AuthFormRequest, AuthFormResponse, PasswordChange };

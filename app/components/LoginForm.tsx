@@ -11,16 +11,20 @@ import { authenticateAction } from "../actions/actions"
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
+export function LoginForm({ className, ...props }: LoginFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [username, setUsername] = React.useState<string>("")
   const [password, setPassword] = React.useState<string>("")
   const [success, setSuccess] = React.useState<string | null>(null)
   const [error, setError] = React.useState<string | null>(null)
-  const [message, setMessage] = React.useState<string | null>(null)
   const router = useRouter();
+
+  React.useEffect(() => {
+    Cookies.get('message') && setError(Cookies.get('message')!)
+    Cookies.remove('message')
+  })
 
 
   async function onSubmit(event: React.SyntheticEvent) {

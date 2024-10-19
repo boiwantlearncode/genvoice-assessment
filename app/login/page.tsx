@@ -1,6 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
-import { UserAuthForm } from "../components/user-auth-form";
+import { LoginForm } from "../components/LoginForm";
 
 export default function Home() {
   return (
@@ -15,7 +13,7 @@ export default function Home() {
               Enter your credentials to access your account
             </p>
           </div>
-          <UserAuthForm />
+          <LoginForm />
         </div>
       </div>
     </div>

@@ -1,12 +1,12 @@
-import type { AuthFormRequest, AuthFormResponse } from "../types/types";
+import type { AuthFormRequest, AuthFormResponse, PasswordChange } from "../types/types";
 import { SignJWT } from 'jose';  // Import the SignJWT class from jose
 
-const secretKey = 'GenVoiceAI';
+let savedUsername = 'genvoice';
+let savedPassword = 'GenVoice123!';
 
-export async function generateToken(username: string, secretKey: string) {
+async function generateToken(username: string) {
   // Convert from string to Uint8Array
-  const secret = new TextEncoder().encode(secretKey);
-  // const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+  const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
 
   // Create a JWT token with a payload and set expiration
   const jwt = await new SignJWT({ username })
@@ -17,14 +17,23 @@ export async function generateToken(username: string, secretKey: string) {
   return jwt;
 }
 
-export const authenticateAction = async ({ username, password } : AuthFormRequest): Promise<AuthFormResponse> => {
-  const validUsername = 'genvoice';
-  const validPassword = 'GenVoice123!';
-  
-  if (username === validUsername && password === validPassword) {
-    const token = await generateToken(username, secretKey);
+const authenticateAction = async ({ username, password } : AuthFormRequest): Promise<AuthFormResponse> => {  
+  if (username === savedUsername && password === savedPassword) {
+    const token = await generateToken(username);
     return { success: true, token: token };
   } else {
     return { success: false };
   }
 };
+
+const changePasswordAction = async ({ oldPassword, newPassword } : PasswordChange) => {  
+  if (oldPassword === savedPassword) {
+    savedPassword = newPassword;
+    return { success: true, savedPassword: savedPassword };
+  } else {
+    return { success: false, savedPassword: savedPassword };
+  }
+}
+
+
+export { authenticateAction, changePasswordAction };

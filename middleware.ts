@@ -5,12 +5,9 @@ const secretKey = 'GenVoiceAI'; // Ensure this matches the key used to sign the 
 
 async function isValidToken(token: string) {
   try {
-    // Define your shared secret (use environment variable in production)
-    const secret = new TextEncoder().encode(secretKey);
-
-    // Verify the JWT token with the shared secret key
-    const { payload } = await jwtVerify(token, secret);
-    
+    // const secret = new TextEncoder().encode(secretKey);
+    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);    
     return true; 
   } catch (error) {
     console.error('JWT verification failed:', error);
@@ -20,19 +17,20 @@ async function isValidToken(token: string) {
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get('authToken');
-
   const url = req.nextUrl.clone();
 
   if (url.pathname === '/') {
-    // If the user is authenticated, redirect them to the dashboard
     if (token && token.value) {
       if (await isValidToken(token.value)) {
         url.pathname = '/home';
         return NextResponse.redirect(url);
       } else {
-        // Invalid or expired token, redirect to login
+        // Invalid or expired token, redirect to login with message in cookie
         url.pathname = '/login';
-        return NextResponse.redirect(url);
+        const response = NextResponse.redirect(url);
+        response.cookies.delete('authToken');
+        response.cookies.set('message', 'Session expired. Please log in again.');
+        return response;
       }
     } else {
       // If the user is not authenticated, redirect to login
@@ -41,15 +39,30 @@ export async function middleware(req: NextRequest) {
     }
   }
 
-  if (token && token.value) {
-    if (url.pathname === '/login' && await isValidToken(token.value)) {
-      url.pathname = '/home';
-      return NextResponse.redirect(url);
-
-      // Invalid or expired token, do nothing
+  if (url.pathname === '/login') {
+    if (token && token.value) {
+      if (await isValidToken(token.value)) {
+        url.pathname = '/home';
+        return NextResponse.redirect(url);
+      }
     }
-  } else {
-    if (url.pathname === '/home' || url.pathname === '/settings') {
+    return NextResponse.next();
+  }
+
+  if (url.pathname === '/home' || url.pathname === '/settings') {
+    if (token && token.value) {
+      if (await isValidToken(token.value)) {
+        return NextResponse.next();
+      } else {
+        // Invalid or expired token, redirect to login with message in cookie
+        url.pathname = '/login';
+        const response = NextResponse.redirect(url);
+        response.cookies.delete('authToken');
+        response.cookies.set('message', 'Session expired. Please log in again.');
+        return response;
+      }
+    } else {
+      // If the user is not authenticated, redirect to login
       url.pathname = '/login';
       return NextResponse.redirect(url);
     }
