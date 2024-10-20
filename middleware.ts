@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const secretKey = 'GenVoiceAI'; // Ensure this matches the key used to sign the JWT
-
 async function isValidToken(token: string) {
   try {
-    // const secret = new TextEncoder().encode(secretKey);
-    const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);    
     return true; 
   } catch (error) {

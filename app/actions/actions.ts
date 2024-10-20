@@ -6,7 +6,7 @@ let savedPassword = 'GenVoice123!';
 
 async function generateToken(username: string) {
   // Convert from string to Uint8Array
-  const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
   const jwt = await new SignJWT({ username })
     .setProtectedHeader({ alg: 'HS256' })
