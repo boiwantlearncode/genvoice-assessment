@@ -10,6 +10,8 @@ import { Icons } from "./ui/icons"
 import { authenticateAction } from "../actions/actions"
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { Eye, EyeOff } from 'lucide-react';
+import type { LucideIcon } from "lucide-react";
 
 interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -19,11 +21,25 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   const [password, setPassword] = React.useState<string>("")
   const [success, setSuccess] = React.useState<string | null>(null)
   const [error, setError] = React.useState<string | null>(null)
+  const [Icon, setIcon] = React.useState<LucideIcon>(Eye);
+  const usernameField = React.useRef<HTMLInputElement>(null);
+  const passwordField = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   React.useEffect(() => {
-    Cookies.get('message') && setError(Cookies.get('message')!)
-    Cookies.remove('message')
+    // Note: There's an issue with autofill where the value is read as blank, so need to poll for the value
+    let interval = setInterval(() => {
+      if (usernameField.current) {
+        setUsername(usernameField.current.value)
+        setPassword(passwordField.current!.value)
+        clearInterval(interval)
+      }
+    }, 100)
+
+    if (Cookies.get('message')) {
+      setError(Cookies.get('message')!);
+    }
+    Cookies.remove('message');
   })
 
 
@@ -31,6 +47,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     event.preventDefault()
     setIsLoading(true)
 
+    // console.log("Submitting form", username, password)
     const response = await authenticateAction({username, password})
 
     if (response.success) {
@@ -54,6 +71,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               Username
             </Label>
             <Input
+              ref={usernameField}
               id="username"
               placeholder="Username"
               type="text"
@@ -70,15 +88,18 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               Password
             </Label>
             <Input
+              ref={passwordField}
+              onClickIcon={() => setIcon(Icon === Eye ? EyeOff : Eye)}
               id="password"
               placeholder="Password"
-              type="password"
+              type={Icon === Eye ? "password" : "text"}
               autoCapitalize="none"
               autoComplete="off"
               autoCorrect="off"
               content={password}
               onChange={(event) => setPassword(event.target.value)}
               disabled={isLoading}
+              endIcon={Icon}
             />
           </div>
           <Button disabled={isLoading}>
