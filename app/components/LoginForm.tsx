@@ -28,7 +28,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
   React.useEffect(() => {
     // Note: There's an issue with autofill where the value is read as blank, so need to poll for the value
-    let interval = setInterval(() => {
+    const interval = setInterval(() => {
       if (usernameField.current) {
         setUsername(usernameField.current.value)
         setPassword(passwordField.current!.value)

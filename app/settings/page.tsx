@@ -19,11 +19,11 @@ export default function Home() {
 
   const toggleIcon = (index: number) => {
     if (Icons[index] === Eye) {
-      let tempIcons = [...Icons];
+      const tempIcons = [...Icons];
       tempIcons[index] = EyeOff;
       setIcons(tempIcons);
     } else {
-      let tempIcons = [...Icons];
+      const tempIcons = [...Icons];
       tempIcons[index] = Eye;
       setIcons(tempIcons);
     }

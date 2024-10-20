@@ -27,7 +27,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         />
         {EndIcon && (
           <div 
-            onClick={() => {onClickIcon && onClickIcon()}}
+            onClick={onClickIcon}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer">
             <EndIcon className="text-muted-foreground" size={18} />
           </div>
